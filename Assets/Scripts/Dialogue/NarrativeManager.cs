@@ -1,61 +1,70 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using System.Collections;
 
 public class NarrativeManager : MonoBehaviour
 {
     public TextMeshProUGUI dialogueText;
-    public float typingSpeed = 0.5f;
+    public float typingSpeed = 0.03f;
 
-    private bool isTyping = false;
+    private Queue<string> sentences;
+    private Coroutine typingCoroutine;
 
-    void Start()
+    void Awake()
     {
-        dialogueText.text = "";
+        sentences = new Queue<string>();
     }
 
-    public void ShowText(string newText)
+    public void ShowText(string fullText)
     {
-        if(!isTyping)
+        sentences.Clear();
+
+        string[] lines = fullText.Split(new char[] { '.', '\n' });
+
+        foreach (string line in lines)
         {
-            StartCoroutine(TypeText(newText));
+            if (!string.IsNullOrWhiteSpace(line))
+                sentences.Enqueue(line.Trim() + ".");
         }
+
+        DisplayNextSentence();
     }
 
-    private IEnumerator TypeText(string text)
+    public void DisplayNextSentence()
     {
-        isTyping = true;
-        dialogueText.text = "";
+        if (sentences.Count == 0)
+        {
+            HideText();
+            return;
+        }
 
-        foreach (char letter in text.ToCharArray())
+        string sentence = sentences.Dequeue();
+
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
+
+        typingCoroutine = StartCoroutine(TypeSentence(sentence));
+    }
+
+    IEnumerator TypeSentence(string sentence)
+    {
+        dialogueText.text = "";
+        foreach (char letter in sentence.ToCharArray())
         {
             dialogueText.text += letter;
             yield return new WaitForSeconds(typingSpeed);
         }
-        isTyping = false;
+
+        // Espera 0.8 segundos antes de mostrar a próxima frase
+        yield return new WaitForSeconds(0.8f);
+        DisplayNextSentence();
     }
 
     public void HideText()
     {
-        if(!isTyping)
-        {
-            StartCoroutine(DeleteText());
-        }
-    }
-
-    private IEnumerator DeleteText()
-    {
-        isTyping = true;
-
-        while(dialogueText.text.Length > 0)
-        {
-            dialogueText.text =
-                dialogueText.text.Substring(0, dialogueText.text.Length - 1);
-            yield return new
-            WaitForSeconds(typingSpeed);
-        }
-
-        isTyping = false;
+        dialogueText.text = "";
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
     }
 }

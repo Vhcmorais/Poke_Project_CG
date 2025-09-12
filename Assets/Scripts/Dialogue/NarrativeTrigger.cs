@@ -9,15 +9,10 @@ public class NarrativeTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            // Corrigido: FindObjectOfType<T>()
             NarrativeManager manager = FindObjectOfType<NarrativeManager>();
             if (manager != null)
             {
                 manager.ShowText(storyText);
-            }
-            else
-            {
-                Debug.LogWarning("NarrativeManager não encontrado na cena!");
             }
         }
     }
@@ -34,4 +29,3 @@ public class NarrativeTrigger : MonoBehaviour
         }
     }
 }
-
