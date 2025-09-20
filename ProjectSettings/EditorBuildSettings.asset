@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/CenarioPlanta.unity
     guid: 6317d73198c78ad42ae0c25eab79d593
+  - enabled: 1
+    path: Assets/Scenes/CenaFogo.unity
+    guid: 8459020ddb62a4a46be84afd749d585b
   m_configObjects: {}
